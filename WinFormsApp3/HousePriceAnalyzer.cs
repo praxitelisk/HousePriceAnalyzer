@@ -2,6 +2,7 @@ using Microsoft.ML;
 using Microsoft.ML.Data;
 using ScottPlot;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 
 namespace HousePriceAnalyzer
@@ -10,6 +11,8 @@ namespace HousePriceAnalyzer
     {
         private List<HouseData> houseDataList;
         private ITransformer trainedModel;
+        private MLContext mlContext;
+
 
         public HousePriceAnalyzerForm()
         {
@@ -22,11 +25,11 @@ namespace HousePriceAnalyzer
         private void LoadData()
         {
             // Initialize MLContext
-            MLContext mlContext = new MLContext();
+            mlContext = new MLContext();
 
             // Path to your CSV file
             string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Housing.csv");
-            
+
 
             // Load the data into an IDataView
             IDataView dataView = mlContext.Data.LoadFromTextFile<HouseData>(
@@ -59,7 +62,8 @@ namespace HousePriceAnalyzer
             "mainroad", "guestroom", "basement", "hotwaterheating",
             "airconditioning", "prefarea", "furnishingstatus"
                 }))
-                .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "price", featureColumnName: "Features"));
+                .Append(mlContext.Transforms.NormalizeMinMax("Features")) // Add normalization here
+                .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "price", featureColumnName: "Features", maximumNumberOfIterations: 100));
 
             // Train the model
             trainedModel = pipeline.Fit(splitData.TrainSet);
@@ -866,6 +870,48 @@ namespace HousePriceAnalyzer
         {
             this.labelPredArea.Text = this.trackBar1.Value.ToString();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Check if the model has been trained
+            if (trainedModel == null)
+            {
+                MessageBox.Show("Model has not been trained. Load data and train the model first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Initialize the PredictionEngine
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<HouseData, HousePricePrediction>(trainedModel);
+
+            // Create a sample input (You can replace these values with inputs from textboxes or other controls)
+            var sampleInput = new HouseData
+            {
+
+                area = 3950,                // Example value
+                bedrooms =4,               // Example value
+                bathrooms =1,              // Example value
+                stories = 2,                // Example value
+                parking = 0,                // Example value
+                mainroad = "yes",            // Example value
+                guestroom = "no",            // Example value
+                basement = "no",             // Example value
+                hotwaterheating = "no",      // Example value
+                airconditioning = "no",     // Example value
+                prefarea = "no",            // Example value
+                furnishingstatus = "unfurnished" // Example value
+            };
+
+            // Predict the price
+            var prediction = predictionEngine.Predict(sampleInput);
+
+            // Display the prediction
+            MessageBox.Show($"Predicted Price: {prediction.Price}", "Prediction Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     internal class HouseData
@@ -909,5 +955,12 @@ namespace HousePriceAnalyzer
 
         [LoadColumn(12)]
         public string furnishingstatus { get; set; }
+
+
+    }
+
+    public class HousePricePrediction
+    {
+        public float Price { get; set; }
     }
 }

@@ -742,6 +742,7 @@
             label1.Size = new Size(29, 15);
             label1.TabIndex = 14;
             label1.Text = "area";
+            label1.Click += label1_Click;
             // 
             // comboBox12
             // 
@@ -861,6 +862,7 @@
             button2.TabIndex = 2;
             button2.Text = "Predict Price";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // textBox2
             // 
@@ -878,14 +880,14 @@
             tabPage6.Text = "About";
             tabPage6.UseVisualStyleBackColor = true;
             // 
-            // Form1
+            // HousePriceAnalyzerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(884, 450);
             Controls.Add(tabControl1);
             Controls.Add(button1);
-            Name = "Form1";
+            Name = "HousePriceAnalyzerForm";
             Text = "HousePriceAnalyzer";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
