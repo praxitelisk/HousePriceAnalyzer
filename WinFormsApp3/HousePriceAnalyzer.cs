@@ -25,7 +25,8 @@ namespace HousePriceAnalyzer
             MLContext mlContext = new MLContext();
 
             // Path to your CSV file
-            string dataPath = Path.Combine(Environment.CurrentDirectory, "housing.csv");
+            string dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Housing.csv");
+            
 
             // Load the data into an IDataView
             IDataView dataView = mlContext.Data.LoadFromTextFile<HouseData>(
