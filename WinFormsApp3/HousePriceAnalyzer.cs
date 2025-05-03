@@ -10,16 +10,25 @@ namespace HousePriceAnalyzer
     public partial class HousePriceAnalyzerForm : Form
     {
         private List<HouseData> houseDataList;
-        private ITransformer trainedModel;
-        private MLContext mlContext;
+        
+        private ITransformer trainedModel; // Private variable to hold the trained model
+        private MLContext mlContext; // Private MLContext for consistency
 
 
         public HousePriceAnalyzerForm()
         {
             InitializeComponent();
+            About();
             LoadData();
             PrintAllRecords();
             ShowPriceHistogram();  // Show the price histogram
+        }
+
+        private void About()
+        {
+            richTextBox2.Text = "This program provides statistical analysis and predicts new housing prices based on input data. " +
+                        "It uses machine learning techniques to train a regression model on historical housing data, " +
+                        "allowing users to estimate prices for properties with specific characteristics.";
         }
 
         private void LoadData()
@@ -77,6 +86,31 @@ namespace HousePriceAnalyzer
             System.Diagnostics.Debug.WriteLine($"Mean Absolute Error: {metrics.MeanAbsoluteError:0.##}");
             System.Diagnostics.Debug.WriteLine($"Mean Squared Error: {metrics.MeanSquaredError:0.##}");
             System.Diagnostics.Debug.WriteLine($"Root Mean Squared Error: {metrics.RootMeanSquaredError:0.##}");
+
+            var testInput = new HouseData
+            {
+                area = 2000,
+                bedrooms = 3,
+                bathrooms = 2,
+                stories = 2,
+                parking = 1,
+                mainroad = "yes",
+                guestroom = "no",
+                basement = "no",
+                hotwaterheating = "no",
+                airconditioning = "yes",
+                prefarea = "yes",
+                furnishingstatus = "furnished"
+            };
+
+            // Create a prediction engine
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<HouseData, HousePricePrediction>(trainedModel);
+
+            // Make a prediction
+            var testPrediction = predictionEngine.Predict(testInput);
+
+            // Display the test prediction
+            System.Diagnostics.Debug.WriteLine($"Test Prediction - Predicted Price: {testPrediction.Price}");
         }
 
         private void PrintAllRecords()
@@ -175,7 +209,7 @@ namespace HousePriceAnalyzer
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            Application.Exit();
         }
 
         private void splitContainer1_Panel1_Paint(object sender, PaintEventArgs e)
@@ -880,32 +914,35 @@ namespace HousePriceAnalyzer
                 return;
             }
 
-            // Initialize the PredictionEngine
+            // Create a prediction engine
             var predictionEngine = mlContext.Model.CreatePredictionEngine<HouseData, HousePricePrediction>(trainedModel);
 
-            // Create a sample input (You can replace these values with inputs from textboxes or other controls)
-            var sampleInput = new HouseData
+            // Example input
+            var input = new HouseData
             {
-
-                area = 3950,                // Example value
-                bedrooms =4,               // Example value
-                bathrooms =1,              // Example value
-                stories = 2,                // Example value
-                parking = 0,                // Example value
-                mainroad = "yes",            // Example value
-                guestroom = "no",            // Example value
-                basement = "no",             // Example value
-                hotwaterheating = "no",      // Example value
-                airconditioning = "no",     // Example value
-                prefarea = "no",            // Example value
-                furnishingstatus = "unfurnished" // Example value
+                
+                area = trackBar1.Value,
+                bedrooms = float.Parse(comboBox2.SelectedItem.ToString()),
+                bathrooms = float.Parse(comboBox3.SelectedItem.ToString()),
+                stories = float.Parse(comboBox4.SelectedItem.ToString()),
+                parking = float.Parse(comboBox10.SelectedItem.ToString()),
+                mainroad = comboBox5.SelectedItem.ToString(),
+                guestroom = comboBox6.SelectedItem.ToString(),
+                basement = comboBox7.SelectedItem.ToString(),
+                hotwaterheating = comboBox8.SelectedItem.ToString(),
+                airconditioning = comboBox9.SelectedItem.ToString(),
+                prefarea = comboBox11.SelectedItem.ToString(),
+                furnishingstatus = comboBox12.SelectedItem.ToString()
             };
 
-            // Predict the price
-            var prediction = predictionEngine.Predict(sampleInput);
+            // Make a prediction
+            var prediction = predictionEngine.Predict(input);
 
-            // Display the prediction
-            MessageBox.Show($"Predicted Price: {prediction.Price}", "Prediction Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Display the result
+            MessageBox.Show($"Predicted price: {prediction.Price}");
+            System.Diagnostics.Debug.WriteLine($"Predicted price: {prediction.Price}");
+
+            textBox2.Text = prediction.Price.ToString();
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -961,6 +998,7 @@ namespace HousePriceAnalyzer
 
     public class HousePricePrediction
     {
+        [ColumnName("Score")]
         public float Price { get; set; }
     }
 }

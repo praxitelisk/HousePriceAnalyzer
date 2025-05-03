@@ -96,6 +96,7 @@
             button2 = new Button();
             textBox2 = new TextBox();
             tabPage6 = new TabPage();
+            richTextBox2 = new RichTextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -112,6 +113,7 @@
             groupBox2.SuspendLayout();
             tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            tabPage6.SuspendLayout();
             SuspendLayout();
             // 
             // richTextBox1
@@ -873,12 +875,22 @@
             // 
             // tabPage6
             // 
+            tabPage6.Controls.Add(richTextBox2);
             tabPage6.Location = new Point(4, 24);
             tabPage6.Name = "tabPage6";
             tabPage6.Size = new Size(852, 369);
             tabPage6.TabIndex = 5;
             tabPage6.Text = "About";
             tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox2
+            // 
+            richTextBox2.Location = new Point(12, 15);
+            richTextBox2.Name = "richTextBox2";
+            richTextBox2.ReadOnly = true;
+            richTextBox2.Size = new Size(830, 338);
+            richTextBox2.TabIndex = 0;
+            richTextBox2.Text = "";
             // 
             // HousePriceAnalyzerForm
             // 
@@ -910,6 +922,7 @@
             tabPage4.ResumeLayout(false);
             tabPage4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
+            tabPage6.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -983,5 +996,6 @@
         private TrackBar trackBar1;
         private Label labelPredArea;
         private ComboBox comboBox2;
+        private RichTextBox richTextBox2;
     }
 }
